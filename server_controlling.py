@@ -9,7 +9,7 @@ def start():
     if process and process.poll() is None:
         print("Flask Server already running")
     else:
-        process = subprocess.Popen(["python", "server.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        process = subprocess.Popen([sys.executable, "server.py"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         print("Flask Server started")
 
 def stop():
