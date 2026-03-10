@@ -23,10 +23,13 @@ def index():
 @app.route("/agent/register")
 def register():
     guid = randomuuid()
-    agents[guid] = {
+    if guid not in agents:
+        agents[guid] = {
         "id": guid,
         "ip": request.remote_addr }
-    return guid
+        return guid
+    else:
+        return "Agent is already registered"
 
 @app.route("/agent/<agent_guid>")
 def agent(agent_guid):
