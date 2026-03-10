@@ -61,7 +61,13 @@ def output(agent_guid):
 
 @app.route("/agent/list")
 def list_agents():
-    return jsonify(agents)
+    auth_header = request.headers.get("X-Auth-ID")
+    if not auth_header:
+        return "Validation failed"
+    if auth_header != "MyErebusToken":
+        return "Validation failed"
+    else:
+        return jsonify(agents)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)

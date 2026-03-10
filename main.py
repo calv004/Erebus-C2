@@ -44,7 +44,7 @@ while True:
 
 
     elif user_input.lower() == "list":
-        response = requests.get("http://127.0.0.1:5000/agent/list")
+        response = requests.get("http://127.0.0.1:5000/agent/list", headers={'X-Auth-ID': 'MyErebusToken'})
         print(response.text)
     else:
         print("Command not recognized")
