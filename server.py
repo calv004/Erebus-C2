@@ -76,15 +76,20 @@ def command(agent_guid):
     else:
         shared.delete_command()
         return cmd
-@app.route("/agent/<agent_guid>/output", methods=["POST"])
+
+@app.route("/agent/<agent_guid>/output", methods=["GET", "POST"])
 def output(agent_guid):
     if agent_guid not in agents:
         return "No such agent"
-    else:
+
+    if request.method == "POST":
         data = request.get_data(as_text=True)
+        agents[agent_guid]["output"] = data + "\n"
+        #agents[agent_guid]["output"] = agents[agent_guid].get("output", "") + data + "\n"
+        return "OK"
 
-        agents[agent_guid]["output"] = agents[agent_guid].get("output", "") + data + "\n"
-
+    elif request.method == "GET":
+        return agents[agent_guid].get("output", "No output yet")
 
 @app.route("/agent/list")
 def list_agents():

@@ -45,6 +45,10 @@ while True:
 
     elif user_input.lower() == "command_output":
         agent_uuid = input("Enter Agent UUID: ")
+        response = requests.get(
+            url=f"http://127.0.0.1:5000/agent/{agent_uuid}/output"
+        )
+        print(response.text)
 
     elif user_input.lower() == "list":
         response = requests.get("http://127.0.0.1:5000/agent/list", headers={'X-Auth-ID': 'MyErebusToken'})
