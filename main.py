@@ -1,3 +1,5 @@
+import json
+
 import server_controlling
 import random
 import shared
@@ -41,11 +43,16 @@ while True:
         command = input("Which cmd should be executed: ")
         shared.set_command(command)
 
-
+    elif user_input.lower() == "command_output":
+        agent_uuid = input("Enter Agent UUID: ")
 
     elif user_input.lower() == "list":
         response = requests.get("http://127.0.0.1:5000/agent/list", headers={'X-Auth-ID': 'MyErebusToken'})
-        print(response.text)
+
+        data = json.loads( response.text)
+
+        for key, value in data.items():
+            print(f"{key}: {value}")
     else:
         print("Command not recognized")
 
