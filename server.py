@@ -85,7 +85,6 @@ def output(agent_guid):
     if request.method == "POST":
         data = request.get_data(as_text=True)
         agents[agent_guid]["output"] = data + "\n"
-        #agents[agent_guid]["output"] = agents[agent_guid].get("output", "") + data + "\n"
         return "OK"
 
     elif request.method == "GET":
