@@ -91,6 +91,7 @@ This is just an idea. It will be developed in near future.
 3. Agent polls GET /agent/<uuid>/command in a loop
 4. Operator sends command via CLI → agent receives and executes it
 5. Agent returns output (future feature)
+```
 
 ---
 
