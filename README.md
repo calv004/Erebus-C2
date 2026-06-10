@@ -94,6 +94,28 @@ This is just an idea. It will be developed in near future.
 
 ```
 
+## 💎 Crystal Palace — Shellcode Loader Builder
+
+Crystal Palace is a build utility that compiles Erebus into a position-independent shellcode blob, ready for injection or reflective loading.
+
+### Usage
+
+\`\`\`bash
+./link loader.spec Erebus.dll Erebus.bin
+xxd -i Erebus.bin > Erebus_shellcode.txt
+\`\`\`
+
+### Steps
+
+1. Run \`link\` with your loader spec and the compiled \`Erebus.dll\` — outputs \`Erebus.bin\` as a raw shellcode blob.
+2. Convert the binary to a C-style byte array with \`xxd -i\` — the resulting \`Erebus_shellcode.txt\` can be embedded directly into a loader or injector.
+
+### Credits
+
+Inspired by the work of **Raphael Mudge**, creator of Cobalt Strike, and **Rastamouse** of [Zero-Point Security](https://training.zeropointsecurity.co.uk) — whose research and courses on malware development and shellcode tradecraft laid much of the groundwork for this approach.
+
+```
+
 ## 🛣️ Roadmap
 
 - [ ] Agent for Windows written in C
