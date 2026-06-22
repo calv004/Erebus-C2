@@ -118,9 +118,7 @@ Inspired by the work of **Raphael Mudge**, creator of Cobalt Strike, and **Rasta
 ---
 
 ## 🛣️ Roadmap
-
-- [ ] Agent for Windows written in C
-- [ ] Multiple concurrent agent support
-- [ ] Encrypted communication (HTTPS / AES)
+- [ ] Encrypted communication
 - [ ] Agent sleep interval control
 - [ ] Persistence mechanisms
+- [ ] Collect command output
