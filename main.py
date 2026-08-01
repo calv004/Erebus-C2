@@ -17,6 +17,8 @@ command
 
 """)
 
+sleep = 30
+uuid = ""
 while True:
     user_input = input("command>:")
 
@@ -41,7 +43,7 @@ while True:
 
     elif user_input.lower() == "command":
         command = input("Which cmd should be executed: ")
-        shared.set_command(command)
+        shared.set_command(command, uuid, sleep)
 
     elif user_input.lower() == "command_output":
         agent_uuid = input("Enter Agent UUID: ")
@@ -57,6 +59,13 @@ while True:
 
         for key, value in data.items():
             print(f"{key}: {value}")
+
+    elif user_input.lower() == "sleep":
+        sleep = input("Sleep Time: ")
+
+    elif user_input.lower() == "use agent":
+        uuid = input("Enter Agent UUID: ")
+
     else:
         print("Command not recognized")
 

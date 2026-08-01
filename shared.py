@@ -1,8 +1,8 @@
 command = None
 
-def set_command(cmd):
+def set_command(cmd, uuid, sleep):
     with open("command.txt", "w" ) as f:
-        f.write(cmd)
+        f.write(cmd + ";" + uuid + ":" + sleep)
 
 def read_command():
     try:
