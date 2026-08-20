@@ -67,14 +67,14 @@ def agent(agent_guid):
 @app.route("/agent/<agent_guid>/command")
 def command(agent_guid):
 
-    cmd = shared.read_command()
+    cmd = shared.read_command(agent_guid)
 
     if agent_guid not in agents:
         return "No such agent"
     elif cmd  == None:
         return "No command set"
     else:
-        shared.delete_command()
+        shared.delete_command(agent_guid)
         return cmd
 
 @app.route("/agent/<agent_guid>/output", methods=["GET", "POST"])

@@ -33,14 +33,8 @@ def get_commands():
             found = True
             continue
 
-        if c == ":":
-            uuid_found = True
-            continue
-
         if not found:
             command += c
-        elif not uuid_found:
-            get_uuid += c
         else:
             sleep += c
 
