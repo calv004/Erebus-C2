@@ -31,10 +31,13 @@ while True:
           
           start (Start FLask Server)
           stop (Stop Flask Server)
+          use agent (set Agent UUID)
           command (Send Command to the Agent)
+          command_output (Output for Agent commands)
           sleep (Change Sleep of Agent)
           list (list active Agents)
           exit (Exit the program)
+          
           """)
     elif user_input.lower() == "exit":
         break
