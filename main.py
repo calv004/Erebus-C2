@@ -3,9 +3,9 @@ import json
 import server_controlling
 import random
 import shared
-import server
 import requests
 import urllib3
+import argparse
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -21,8 +21,36 @@ command
 
 """)
 
-sleep = 30
+parser = argparse.ArgumentParser(description="Please provide your server config")
+parser.add_argument("arg1", type=str, help="The first argument (string)")
+args = parser.parse_args()
+
+# Access and use the arguments
+print(f"Argument 1: {args.arg1}")
+
+with open(args.arg1, "r") as f:
+    for line in f:
+        if line.startswith("server:"):
+            server_config = line
+        elif line.startswith("port:"):
+            port_config = line
+        elif line.startswith("sleep:"):
+            sleep = line
+        elif line.startswith("register_url:"):
+            register_url = line
+        elif line.startswith("command_url:"):
+            command_url = line
+        elif line.startswith("base_url:"):
+            base_url = line
+
+server_config = server_config.replace("server:", "").strip("\"\n")
+port_config = port_config.replace("port:", "").strip("\"\n")
+sleep = sleep.replace("sleep:", "").strip("\"\n")
+register_url = register_url.replace("register_url:", "").strip("\"\n")
+command_url = command_url.replace("command_url:", "").strip("\"\n")
+base_url = base_url.replace("base_url:", "").strip("\"\n")
 uuid = ""
+
 while True:
     user_input = input("command>:")
 
@@ -43,7 +71,7 @@ while True:
         break
 
     elif user_input.lower() == "start":
-        server_controlling.start()
+        server_controlling.start(register_url, command_url, base_url, port_config)
 
     elif user_input.lower() == "stop":
         server_controlling.stop()
@@ -55,13 +83,13 @@ while True:
     elif user_input.lower() == "command_output":
         agent_uuid = input("Enter Agent UUID: ")
         response = requests.get(
-            url=f"https://127.0.0.1:5000/agent/{agent_uuid}/output",
+            url=f"https://127.0.0.1:{port_config}{base_url}/{agent_uuid}/output",
             verify=False
         )
         print(response.text)
 
     elif user_input.lower() == "list":
-        response = requests.get("https://127.0.0.1:5000/agent/list", headers={'X-Auth-ID': 'MyErebusToken'}, verify=False)
+        response = requests.get(f"https://127.0.0.1:{port_config}{base_url}/list", headers={'X-Auth-ID': 'MyErebusToken'}, verify=False)
 
         data = json.loads( response.text)
 

