@@ -1,3 +1,5 @@
+import os
+
 command = None
 
 def set_command(cmd, uuid, sleep):
@@ -14,7 +16,6 @@ def read_command(uuid):
 
 
 def delete_command(uuid):
-    with open(uuid, "w") as f:
-        f.write("")
+    os.remove(uuid)
 
 
