@@ -43,6 +43,7 @@ with open(args.arg1, "r") as f:
         elif line.startswith("base_url:"):
             base_url = line
 
+
 server_config = server_config.replace("server:", "").strip("\"\n")
 port_config = port_config.replace("port:", "").strip("\"\n")
 sleep = sleep.replace("sleep:", "").strip("\"\n")
@@ -101,6 +102,16 @@ while True:
 
     elif user_input.lower() == "use agent":
         uuid = input("Enter Agent UUID: ")
+
+    elif user_input.lower() == "generate agent":
+        agent_file = input("Enter path to agent file:")
+        with open(agent_file, "r") as f:
+            file = f.read()
+
+            file_new = file.replace("{{SERVER}}", server_config).replace("{{PORT}}", port_config).replace("{{AGENT}}", base_url).replace("{{SLEEP}}", sleep).replace("{{REGISTER}}", register_url).replace("{{COMMAND}}", command_url)
+
+            with open("generate.c", "w") as f:
+                f.write(file_new)
 
     else:
         print("Command not recognized")
